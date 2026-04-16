@@ -32,10 +32,14 @@ export function normalizeMessage(body: WebhookBody): NormalizedMessage {
   const messageText =
     typeof message.content === 'string' ? message.content : ''
 
-  const messageTimestamp =
+  const ts =
     typeof message.messageTimestamp === 'string'
       ? parseInt(message.messageTimestamp, 10)
       : message.messageTimestamp
+
+  const messageTimestamp = Number.isNaN(ts)
+    ? Math.floor(Date.now() / 1000)
+    : ts
 
   const fromMe =
     typeof message.fromMe === 'string'
