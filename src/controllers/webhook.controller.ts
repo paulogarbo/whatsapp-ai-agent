@@ -4,7 +4,6 @@ import { normalizeMessage } from '../services/normalizer.service.js'
 import { blockService } from '../services/block.service.js'
 import { bufferService } from '../services/buffer.service.js'
 import { customerService } from '../services/customer.service.js'
-import { mediaService } from '../services/media.service.js'
 import { rateLimitService } from '../services/rate-limit.service.js'
 import { whatsappService } from '../services/whatsapp.service.js'
 import { logger } from '../lib/logger.js'
@@ -55,16 +54,6 @@ export async function webhookController(
       logger.info({ sender: msg.sender, content_type: msg.content_type }, 'unsupported media type')
       await reply.status(200).send({ ok: true, reason: 'unsupported' })
       return
-    }
-
-    if (msg.content_type === 'audio') {
-      const transcription = await mediaService.downloadAndTranscribeAudio({
-        messageId: msg.id,
-        baseUrl: body.BaseUrl,
-        token: msg.token,
-      })
-      msg.message = transcription
-      msg.content_type = 'text'
     }
 
     await customerService.upsert(msg)
