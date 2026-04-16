@@ -10,7 +10,7 @@ export const bufferService = {
     await redis.rpush(sender, JSON.stringify(message))
   },
 
-  async schedule(sender: string): Promise<void> {
+  async schedule(sender: string, token: string): Promise<void> {
     const jobId = `${JOB_ID_PREFIX}:${sender}`
 
     const existing = await messageQueue.getJob(jobId)
@@ -18,7 +18,7 @@ export const bufferService = {
       await existing.remove()
     }
 
-    await messageQueue.add('process', { sender }, { delay: DEBOUNCE_DELAY_MS, jobId })
+    await messageQueue.add('process', { sender, token }, { delay: DEBOUNCE_DELAY_MS, jobId })
   },
 
   async flush(sender: string): Promise<NormalizedMessage[]> {
