@@ -1,7 +1,9 @@
 import 'dotenv/config'
 import './lib/env.js'
 import { buildApp } from './app.js'
-import './jobs/worker.js'
+import { messageWorker } from './jobs/worker.js'
+import { messageQueue } from './jobs/queue.js'
+import { redis } from './lib/redis.js'
 
 const app = buildApp()
 
@@ -15,3 +17,15 @@ const start = async () => {
 }
 
 start()
+
+const shutdown = async () => {
+  app.log.info('Shutting down...')
+  await messageWorker.close()
+  await messageQueue.close()
+  await redis.quit()
+  await app.close()
+  process.exit(0)
+}
+
+process.on('SIGTERM', shutdown)
+process.on('SIGINT', shutdown)
