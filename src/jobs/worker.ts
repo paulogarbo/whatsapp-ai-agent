@@ -2,6 +2,7 @@ import { Worker } from 'bullmq'
 import { redis } from '../lib/redis.js'
 import { logger } from '../lib/logger.js'
 import { bufferService } from '../services/buffer.service.js'
+import { mediaService } from '../services/media.service.js'
 import { agentService } from '../services/agent.service.js'
 import { ttsService } from '../services/tts.service.js'
 import { whatsappService } from '../services/whatsapp.service.js'
@@ -18,6 +19,17 @@ export const messageWorker = new Worker<MessageJob>(
 
     const messages = await bufferService.flush(sender)
     if (messages.length === 0) return
+
+    for (const m of messages) {
+      if (m.content_type === 'audio') {
+        m.message = await mediaService.downloadAndTranscribeAudio({
+          messageId: m.id,
+          baseUrl: m.baseUrl,
+          token: token,
+        })
+        m.content_type = 'text'
+      }
+    }
 
     const context = messages.map((m) => m.message).join('\n')
 
