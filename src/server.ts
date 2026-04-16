@@ -1,4 +1,5 @@
 import 'dotenv/config'
+import './lib/env.js'
 import { buildApp } from './app.js'
 import './jobs/worker.js'
 
