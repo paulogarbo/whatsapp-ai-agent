@@ -37,15 +37,26 @@ export const messageWorker = new Worker<MessageJob>(
     const context = resolved.map((m) => m.message).join('\n')
 
     const result = await agentService.run(chatId, context)
+    logger.info({ output: result.output, content_type: result.content_type }, 'agentService.run result')
 
     const lines = result.output.split(/\r?\n/).filter((line) => line.trim() !== '')
 
     const sendParams = { token, number: chatId }
 
     if (result.content_type === 'audio') {
-      const audioBase64List = await Promise.all(lines.map((line) => ttsService.synthesize(line)))
+      logger.info({ content_type: result.content_type }, 'taking audio path')
+      const audioBase64List = await Promise.all(
+        lines.map(async (line) => {
+          logger.info({ line }, 'sending line to ttsService.synthesize')
+          const audioBase64 = await ttsService.synthesize(line)
+          logger.info({ length: audioBase64.length }, 'ttsService.synthesize result')
+          return audioBase64
+        })
+      )
+      logger.info({ sendParams, audioCount: audioBase64List.length }, 'calling whatsappService.sendAudioMessages')
       await whatsappService.sendAudioMessages(sendParams, audioBase64List)
     } else {
+      logger.info({ content_type: result.content_type }, 'taking text path')
       await whatsappService.sendTextMessages(sendParams, lines)
     }
   },

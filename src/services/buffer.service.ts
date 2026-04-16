@@ -12,7 +12,7 @@ export const bufferService = {
   },
 
   async schedule(sender: string, token: string): Promise<void> {
-    const jobId = `${JOB_ID_PREFIX}:${sender}`
+    const jobId = `${JOB_ID_PREFIX}_${sender.replace(/:/g, '_')}`
 
     const existing = await messageQueue.getJob(jobId)
     if (existing) {
