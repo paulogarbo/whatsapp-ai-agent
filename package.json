@@ -1,0 +1,28 @@
+{
+  "name": "whatsapp-ai-agent",
+  "version": "1.0.0",
+  "description": "WhatsApp AI agent with Fastify, BullMQ and OpenAI",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "lint": "eslint src/**/*.ts"
+  },
+  "dependencies": {
+    "fastify": "^4",
+    "@fastify/env": "^4",
+    "zod": "^3",
+    "ioredis": "^5",
+    "@supabase/supabase-js": "^2",
+    "openai": "^4",
+    "bullmq": "^5",
+    "axios": "^1",
+    "pino": "^8"
+  },
+  "devDependencies": {
+    "typescript": "^5",
+    "tsx": "^4",
+    "@types/node": "^20"
+  }
+}
