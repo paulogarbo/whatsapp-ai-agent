@@ -5,6 +5,8 @@ import { blockService } from '../services/block.service.js'
 import { bufferService } from '../services/buffer.service.js'
 import { customerService } from '../services/customer.service.js'
 import { mediaService } from '../services/media.service.js'
+import { rateLimitService } from '../services/rate-limit.service.js'
+import { whatsappService } from '../services/whatsapp.service.js'
 import { logger } from '../lib/logger.js'
 
 export async function webhookController(
@@ -31,6 +33,16 @@ export async function webhookController(
     const isBlocked = await blockService.isBlocked(msg.sender)
     if (isBlocked) {
       await reply.status(200).send({ ok: true, reason: 'ignored' })
+      return
+    }
+
+    const allowed = await rateLimitService.isAllowed(msg.sender)
+    if (!allowed) {
+      await whatsappService.sendTextMessages(
+        { token: msg.token, number: msg.sender },
+        ['Você atingiu o limite de mensagens por hora. Tente novamente mais tarde. 🙏']
+      )
+      await reply.status(200).send({ ok: true, reason: 'rate_limited' })
       return
     }
 
