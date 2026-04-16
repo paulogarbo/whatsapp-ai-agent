@@ -22,8 +22,13 @@ export const bufferService = {
   },
 
   async flush(sender: string): Promise<NormalizedMessage[]> {
-    const items = await redis.lrange(sender, 0, -1)
-    await redis.del(sender)
+    const results = await redis
+      .multi()
+      .lrange(sender, 0, -1)
+      .del(sender)
+      .exec()
+
+    const items = (results?.[0]?.[1] ?? []) as string[]
     return items.map((item) => JSON.parse(item) as NormalizedMessage)
   },
 }
