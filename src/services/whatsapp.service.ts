@@ -23,7 +23,7 @@ export const whatsappService = {
       await axios.post(
         `${UAZAPI_BASE_URL}/send/text`,
         { number, text, delay: randomDelay() },
-        { headers: { token } }
+        { headers: { token }, timeout: 15_000 }
       )
       await sleep(randomDelay())
     }
@@ -36,7 +36,7 @@ export const whatsappService = {
       await axios.post(
         `${UAZAPI_BASE_URL}/send/media`,
         { number, type: 'audio', file, delay: randomDelay() },
-        { headers: { token } }
+        { headers: { token }, timeout: 15_000 }
       )
       await sleep(randomDelay())
     }

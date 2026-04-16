@@ -15,7 +15,7 @@ export const mediaService = {
     const response = await axios.post<{ base64Data: string }>(
       `${baseUrl}/message/download`,
       { id: messageId, return_base64: true },
-      { headers: { token } }
+      { headers: { token }, timeout: 15_000 }
     )
 
     const buffer = Buffer.from(response.data.base64Data, 'base64')

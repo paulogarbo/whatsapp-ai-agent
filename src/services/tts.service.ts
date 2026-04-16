@@ -15,6 +15,7 @@ export const ttsService = {
           Accept: 'audio/mpeg',
         },
         responseType: 'arraybuffer',
+        timeout: 15_000,
       }
     )
 
