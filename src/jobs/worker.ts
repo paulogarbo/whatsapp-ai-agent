@@ -39,7 +39,7 @@ export const messageWorker = new Worker<MessageJob>(
     const result = await agentService.run(chatId, context)
     logger.info({ output: result.output, content_type: result.content_type }, 'agentService.run result')
 
-    const lines = result.output.split(/\r?\n/).filter((line) => line.trim() !== '')
+    const lines = result.output.replace(/\\n/g, '\n').split(/\r?\n/).filter((line) => line.trim() !== '')
 
     const sendParams = { token, number: chatId }
 
