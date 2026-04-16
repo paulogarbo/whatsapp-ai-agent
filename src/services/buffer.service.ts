@@ -3,7 +3,7 @@ import { messageQueue } from '../jobs/queue.js'
 import type { MessageJob } from '../jobs/queue.js'
 import type { NormalizedMessage } from '../types/message.js'
 
-const DEBOUNCE_DELAY_MS = 9000
+const DEBOUNCE_DELAY_MS = 20000
 const JOB_ID_PREFIX = 'buffer'
 
 export const bufferService = {
