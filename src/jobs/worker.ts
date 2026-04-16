@@ -15,29 +15,32 @@ const connection = new Redis({ ...redisOptions, maxRetriesPerRequest: null })
 export const messageWorker = new Worker<MessageJob>(
   'messages',
   async (job) => {
-    const { sender, token } = job.data
+    const { sender: chatId, token } = job.data
 
-    const messages = await bufferService.flush(sender)
+    const messages = await bufferService.flush(chatId)
     if (messages.length === 0) return
 
-    for (const m of messages) {
-      if (m.content_type === 'audio') {
-        m.message = await mediaService.downloadAndTranscribeAudio({
-          messageId: m.id,
-          baseUrl: m.baseUrl,
-          token: token,
-        })
-        m.content_type = 'text'
-      }
-    }
+    const resolved = await Promise.all(
+      messages.map(async (m) => {
+        if (m.content_type === 'audio') {
+          const transcribed = await mediaService.downloadAndTranscribeAudio({
+            messageId: m.id,
+            baseUrl: m.baseUrl,
+            token,
+          })
+          return { ...m, message: transcribed, content_type: 'text' as const }
+        }
+        return m
+      })
+    )
 
-    const context = messages.map((m) => m.message).join('\n')
+    const context = resolved.map((m) => m.message).join('\n')
 
-    const result = await agentService.run(sender, context)
+    const result = await agentService.run(chatId, context)
 
     const lines = result.output.split(/\r?\n/).filter((line) => line.trim() !== '')
 
-    const sendParams = { token, number: sender }
+    const sendParams = { token, number: chatId }
 
     if (result.content_type === 'audio') {
       const audioBase64List = await Promise.all(lines.map((line) => ttsService.synthesize(line)))
