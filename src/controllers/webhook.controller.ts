@@ -24,18 +24,18 @@ export async function webhookController(
     const msg = normalizeMessage(body)
 
     if (msg.fromMe) {
-      await blockService.setBlock(body.message.chatid ?? msg.sender)
+      await blockService.setBlock(msg.chatId)
       await reply.status(200).send({ ok: true, reason: 'blocked' })
       return
     }
 
-    const isBlocked = await blockService.isBlocked(msg.sender)
+    const isBlocked = await blockService.isBlocked(msg.chatId)
     if (isBlocked) {
       await reply.status(200).send({ ok: true, reason: 'ignored' })
       return
     }
 
-    const allowed = await rateLimitService.isAllowed(msg.sender)
+    const allowed = await rateLimitService.isAllowed(msg.chatId)
     if (!allowed) {
       void whatsappService.sendTextMessages(
         { token: msg.token, number: msg.sender },
@@ -57,8 +57,8 @@ export async function webhookController(
     }
 
     await customerService.upsert(msg)
-    await bufferService.push(msg.sender, msg)
-    await bufferService.schedule(msg.sender, msg.token)
+    await bufferService.push(msg.chatId, msg)
+    await bufferService.schedule(msg.chatId, msg.token)
 
     await reply.status(200).send({ ok: true })
   } catch (err) {

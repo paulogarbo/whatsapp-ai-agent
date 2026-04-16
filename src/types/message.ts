@@ -1,13 +1,14 @@
 export type ContentType = 'text' | 'audio' | 'image' | 'video' | 'document' | 'unknown'
 
 export interface NormalizedMessage {
-  id: string
-  sender: string
-  senderName: string
-  message: string
-  messageTimestamp: number
-  content_type: ContentType
-  fromMe: boolean
-  token: string
-  baseUrl: string
+  readonly id: string
+  readonly sender: string
+  readonly senderName: string
+  readonly message: string
+  readonly messageTimestamp: number
+  readonly content_type: ContentType
+  readonly fromMe: boolean
+  readonly token: string
+  readonly baseUrl: string
+  readonly chatId: string  // group ID for group chats, same as sender for 1:1
 }

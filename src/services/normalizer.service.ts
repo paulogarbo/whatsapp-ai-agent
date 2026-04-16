@@ -56,5 +56,6 @@ export function normalizeMessage(body: WebhookBody): NormalizedMessage {
     fromMe,
     token: body.token,
     baseUrl: body.BaseUrl,
+    chatId: message.chatid ?? sender,
   }
 }
