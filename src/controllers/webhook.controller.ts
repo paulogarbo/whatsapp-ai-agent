@@ -37,7 +37,7 @@ export async function webhookController(
 
     const allowed = await rateLimitService.isAllowed(msg.sender)
     if (!allowed) {
-      await whatsappService.sendTextMessages(
+      void whatsappService.sendTextMessages(
         { token: msg.token, number: msg.sender },
         ['Você atingiu o limite de mensagens por hora. Tente novamente mais tarde. 🙏']
       )
