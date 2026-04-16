@@ -109,6 +109,49 @@ npm run dev
 
 ---
 
+## Running with Docker
+
+The project includes a `docker-compose.yml` for Redis. To start:
+
+```bash
+docker compose up -d
+```
+
+Then run the app normally:
+
+```bash
+npm run dev
+```
+
+To stop Redis:
+
+```bash
+docker compose down
+```
+
+---
+
+## Exposing the webhook locally (ngrok)
+
+UazAPI needs a public URL to send webhooks to your local machine.
+Use [ngrok](https://ngrok.com) to create a tunnel:
+
+```bash
+npx ngrok http 3000
+```
+
+Copy the generated URL (e.g. `https://abc123.ngrok.io`) and set it as your
+webhook URL in the UazAPI dashboard:
+
+```
+https://abc123.ngrok.io/gerar-resposta/agente-ai
+```
+
+> The ngrok URL changes every time you restart it on the free plan.
+> For a stable URL, use a paid ngrok plan or deploy the project.
+
+---
+
 ## Environment variables
 
 | Variable | Description |
