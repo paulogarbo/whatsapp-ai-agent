@@ -36,7 +36,14 @@ export const agentService = {
     const memoryKey = `${sender}_memory`
 
     const raw = await redis.get(memoryKey)
-    let history: ChatMessage[] = raw ? (JSON.parse(raw) as ChatMessage[]) : []
+    let history: ChatMessage[] = []
+    if (raw) {
+      try {
+        history = JSON.parse(raw) as ChatMessage[]
+      } catch {
+        // corrupted memory — start fresh, do not crash the job
+      }
+    }
 
     history.push({ role: 'user', content: userMessage })
 
@@ -48,7 +55,13 @@ export const agentService = {
 
     const responseContent = completion.choices[0].message.content ?? '{}'
 
-    const parsed = AgentOutputSchema.parse(JSON.parse(responseContent))
+    let parsed: AgentOutput
+    try {
+      parsed = AgentOutputSchema.parse(JSON.parse(responseContent))
+    } catch {
+      // malformed LLM response — return safe text fallback
+      parsed = { output: 'Desculpe, não consegui processar sua mensagem.', content_type: 'text' }
+    }
 
     history.push({ role: 'assistant', content: responseContent })
 
