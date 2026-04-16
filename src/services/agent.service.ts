@@ -53,7 +53,11 @@ export const agentService = {
       response_format: { type: 'json_object' },
     })
 
-    const responseContent = completion.choices[0].message.content ?? '{}'
+    const choice = completion.choices[0]
+    if (!choice) {
+      throw new Error('OpenAI returned no choices — possible content filter')
+    }
+    const responseContent = choice.message.content ?? '{}'
 
     let parsed: AgentOutput
     try {
