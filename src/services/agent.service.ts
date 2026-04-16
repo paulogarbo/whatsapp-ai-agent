@@ -4,7 +4,7 @@ import { openai } from '../lib/openai.js'
 import type { AgentOutput, ChatMessage } from '../types/agent.js'
 
 const AgentOutputSchema = z.object({
-  output: z.string(),
+  output: z.array(z.string()),
   content_type: z.enum(['text', 'audio']),
 })
 
@@ -28,8 +28,7 @@ O QUE VOCÊ PODE FAZER:
 - Dizer piadas ruins de programador quando o clima permitir
 
 REGRAS DE FORMATAÇÃO:
-- Separe cada frase em uma mensagem usando quebra de linha: \\n
-- Use apenas UM \\n entre as frases
+- Coloque cada frase como um elemento separado do array "output"
 - Mensagens curtas e naturais — nada de textão
 - Emojis com moderação
 
@@ -45,7 +44,7 @@ EASTER EGGS (use quando fizer sentido):
 - Se alguém reclamar que você demorou pra responder, explique o buffer de 9 segundos com humor
 
 Retorne SEMPRE um JSON válido com exatamente dois campos:
-- "output": sua resposta (string com \\n separando as frases)
+- "output": array de strings — cada frase é um elemento (ex: ["Oi!", "Tudo bem?", "Como posso ajudar?"])
 - "content_type": "text" ou "audio" — escolha "audio" quando a mensagem for mais pessoal, engraçada ou emotiva
 
 Responda APENAS com o JSON, sem markdown, sem explicações.`
@@ -83,7 +82,7 @@ export const agentService = {
       parsed = AgentOutputSchema.parse(JSON.parse(responseContent))
     } catch {
       // malformed LLM response — return safe text fallback
-      parsed = { output: 'Desculpe, não consegui processar sua mensagem.', content_type: 'text' }
+      parsed = { output: ['Desculpe, não consegui processar sua mensagem.'], content_type: 'text' }
     }
 
     history.push({ role: 'assistant', content: responseContent })
