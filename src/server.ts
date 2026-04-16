@@ -1,5 +1,6 @@
 import 'dotenv/config'
 import { buildApp } from './app.js'
+import './jobs/worker.js'
 
 const app = buildApp()
 
