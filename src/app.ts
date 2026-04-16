@@ -1,4 +1,5 @@
 import Fastify from 'fastify'
+import { webhookRoute } from './routes/webhook.route.js'
 
 export function buildApp() {
   const app = Fastify({
@@ -12,6 +13,7 @@ export function buildApp() {
   })
 
   app.get('/health', async () => ({ status: 'ok' }))
+  app.register(webhookRoute)
 
   return app
 }
