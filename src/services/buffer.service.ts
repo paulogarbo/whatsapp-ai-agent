@@ -1,5 +1,6 @@
 import { redis } from '../lib/redis.js'
 import { messageQueue } from '../jobs/queue.js'
+import type { MessageJob } from '../jobs/queue.js'
 import type { NormalizedMessage } from '../types/message.js'
 
 const DEBOUNCE_DELAY_MS = 9000
@@ -18,7 +19,7 @@ export const bufferService = {
       await existing.remove()
     }
 
-    await messageQueue.add('process', { sender, token }, { delay: DEBOUNCE_DELAY_MS, jobId })
+    await messageQueue.add('process', { sender, token } satisfies MessageJob, { delay: DEBOUNCE_DELAY_MS, jobId })
   },
 
   async flush(sender: string): Promise<NormalizedMessage[]> {
