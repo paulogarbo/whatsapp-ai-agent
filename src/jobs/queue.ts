@@ -1,6 +1,8 @@
 import { Queue } from 'bullmq'
-import { redis } from '../lib/redis.js'
+import Redis from 'ioredis'
+import { redisOptions } from '../lib/redis.js'
 
-export const messageQueue = new Queue('messages', {
-  connection: redis,
-})
+// BullMQ requires maxRetriesPerRequest: null
+const connection = new Redis({ ...redisOptions, maxRetriesPerRequest: null })
+
+export const messageQueue = new Queue('messages', { connection })

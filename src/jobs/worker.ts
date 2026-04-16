@@ -1,11 +1,15 @@
 import { Worker } from 'bullmq'
-import { redis } from '../lib/redis.js'
+import Redis from 'ioredis'
+import { redisOptions } from '../lib/redis.js'
 import { logger } from '../lib/logger.js'
 import { bufferService } from '../services/buffer.service.js'
 import { mediaService } from '../services/media.service.js'
 import { agentService } from '../services/agent.service.js'
 import { ttsService } from '../services/tts.service.js'
 import { whatsappService } from '../services/whatsapp.service.js'
+
+// BullMQ requires maxRetriesPerRequest: null
+const connection = new Redis({ ...redisOptions, maxRetriesPerRequest: null })
 
 interface MessageJob {
   sender: string
@@ -47,7 +51,7 @@ export const messageWorker = new Worker<MessageJob>(
     }
   },
   {
-    connection: redis,
+    connection,
     concurrency: 5,
   }
 )
